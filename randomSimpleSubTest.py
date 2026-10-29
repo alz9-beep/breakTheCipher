@@ -19,7 +19,7 @@ uppercase_letters = string.ascii_uppercase
 lowercase_letters = string.ascii_lowercase
 punctuation_chars = string.punctuation
 
-cipher_sigma = uppercase_letters + punctuation_chars
+cipher_sigma = uppercase_letters
 
 plaintext_sigma = lowercase_letters
 
@@ -33,7 +33,7 @@ def countingArr(size): #this is created to hold valid swappable character indice
 	return ret
 
 def randomizedPlainText(pt): #pt elements
-	random_chars = string.ascii_uppercase + string.punctuation
+	random_chars = string.ascii_uppercase
 	index_pool = countingArr(len(random_chars))
 	pt_len = len(pt)
 	
@@ -44,7 +44,7 @@ def randomizedPlainText(pt): #pt elements
 	return pt
 
 def cipherConvert(arr):
-	random_txt = string.ascii_uppercase + string.punctuation
+	random_txt = string.ascii_uppercase
 	length = len(random_txt)
 	arr_length = len(arr)
 	key = dict()
