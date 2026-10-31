@@ -1,59 +1,48 @@
 import sys
 import string
+import random
 
-#takes a cipher text, finds letter frequency, uses letter distributions and guesses PT
-
-#assumes cipher text is letters, spaces and punctuation. Lowercase is also converted to uppercase
-CipherText = input("Enter cipher text: ").upper()
-
-if CipherText.strip() == "":
-    print("No encrypted message given!")
-    sys.exit()
-
-PlainSigma = string.ascii_lowercase
-CipherSigma = string.ascii_uppercase
-
-CipherFreq = dict()
 
 def printDict(dictionary):
     for key,val in dictionary.items():
         print("key: ", key, "\tval: ", val ,"\n")
 
-#only A-Z are counted, spaces and punctuation are skipped
-for letter in CipherText:
-    if letter not in string.ascii_uppercase:
-        continue
-    if letter not in CipherFreq:
-        CipherFreq[letter] = 1
-        print(letter + "\n")
-    else:
-        CipherFreq[letter] += 1
-print("cipher freq:\n")
-printDict(CipherFreq)
+#takes a cipher text, finds letter frequency, uses letter distributions and guesses PT
 
-def freqGrabber(freqDict):
+def freqDictToList(freqDict) -> list:
     frequencies = []
     for value in freqDict.values():
         frequencies.append(value)
     return sorted(frequencies)
 
-frequencyList = freqGrabber(CipherFreq)
 
 #to narrow 25! to something more manageable, we will use freq pools
 #permutations will only be made with letters from the same pool
 
-#groups follow english letter frequency order from most common to least
-group1 = [ "e", "t", "a" ]
-group2 = [ "o", "i", "n" ]
-group3 = [ "s", "h", "r" ]
-group4 = [ "d", "l", "c" ]
-group5 = [ "u", "m", "w" ]
-group6 = [ "f", "g", "y" ]
-group7 = [ "p", "b", "v" ]
-group8 = [ "k", "j", "x" ]
-group9 = [ "q", "z" ]
+def counter(num):
+    ret = []
+    for i in range(num):
+        ret.append(i)
+    return ret
 
-alphabetFreq = group1 + group2 + group3 + group4 + group5 + group6 + group7 + group8 + group9
+#groups follow english letter frequency order from most common to least
+
+def shuffle(group):
+    mini_list = group.copy() 
+    shuffled = []
+
+    while len(mini_list) > 0:
+        test = random.randint(0, len(mini_list) - 1)
+        shuffled.append(mini_list.pop(test))
+
+    return shuffled
+
+
+def listConcat(groups):
+   ret = []
+   for i in range(0, len(groups)):
+       ret += groups[i]
+   return ret
 
 def flipped(list) -> list:
     revList = []
@@ -63,12 +52,12 @@ def flipped(list) -> list:
 
 #first version sorts the frequencies creates the cipher/englishFrequency map
 
-def cipherEngFreqMap(cipherMap, frequencies) -> dict:
+def cipherEngFreqMap(cipherMap: dict, frequencies: list, alphaList: list) -> dict:
     cipherEngMap = dict()
 
     #frequencies are sorted, frequencies[len - 1] checks the current highest frequency
     #since we are popping the alphabetFreq, we will keep a reversed order
-    revAlphabetFreq = flipped(alphabetFreq)
+    revAlphabetFreq = flipped(alphaList)
     while True:
         for key, val in cipherMap.items():
             freq_length = len(frequencies)
@@ -83,11 +72,6 @@ def cipherEngFreqMap(cipherMap, frequencies) -> dict:
             break
     return cipherEngMap
 
-cipherEngMap = cipherEngFreqMap(CipherFreq, frequencyList)
-print("cipher eng map:\n")
-printDict(cipherEngMap)
-#need a shuffle function for the group arrs, will start assuming the default frequencies are correct
-
 def freqMap(cipherEngFreqDict, cText):
     freqGuess = ""
     for letter in cText:
@@ -101,9 +85,6 @@ def freqMap(cipherEngFreqDict, cText):
         return
     return freqGuess
 
-guessedPlainText = freqMap(cipherEngMap, CipherText)
-print("Guess using frequency analysis:\n %s\n", guessedPlainText)
-
 def swapLetter(originalLetter, newLetter, cText):
     
     newCText = ""
@@ -113,8 +94,92 @@ def swapLetter(originalLetter, newLetter, cText):
         else:
             newCText += letter
     return newCText
+#only A-Z are counted, spaces and punctuation are skipped
+def getFrequencies(cipherText: str):
+    CipherFreq = dict()
+    for letter in CipherText:
+        if letter not in string.ascii_uppercase:
+            continue
+        if letter not in CipherFreq:
+            CipherFreq[letter] = 1
+        else:
+            CipherFreq[letter] += 1
+    return CipherFreq
 
-newGuess = guessedPlainText
+
+
+#assumes cipher text is letters, spaces and punctuation. Lowercase is also converted to uppercase
+CipherText = input("Enter cipher text: ").upper()
+
+if CipherText.strip() == "":
+    print("No encrypted message given!")
+    sys.exit()
+
+PlainSigma = string.ascii_lowercase
+CipherSigma = string.ascii_uppercase
+
+
+CipherFreq = getFrequencies(CipherText)
+#print("cipher freq:\n")
+#printDict(CipherFreq)
+
+
+frequencyList = freqDictToList(CipherFreq)
+
+group1 = [ "e", "t", "a" ]
+group2 = [ "o", "i", "n" ]
+group3 = [ "s", "h", "r" ]
+group4 = [ "d", "l", "c" ]
+group5 = [ "u", "m", "w" ]
+group6 = [ "f", "g", "y" ]
+group7 = [ "p", "b", "v" ]
+group8 = [ "k", "j", "x" ]
+group9 = [ "q", "z" ]
+
+
+group_bucket = [group1, group2, group3, group4, group5, group6, group7, group8, group9] 
+def printGroups(groupBucket):
+    i = 0
+    for group in groupBucket:
+        print("group ", i)
+        for letter in group:
+            print(letter + " ")
+        print("\n")
+        i += 1
+#printGroups(group_bucket)
+alphabetFreq = listConcat(group_bucket) 
+
+
+cipherEngMap = cipherEngFreqMap(CipherFreq, frequencyList, alphabetFreq)
+#print("cipher eng map:\n")
+#printDict(cipherEngMap)
+
+
+#need a shuffle function for the group arrs, will start assuming the default frequencies are correct
+guessedPlainText = freqMap(cipherEngMap, CipherText)
+
+print("Guess using frequency analysis:\n", guessedPlainText, "\n", )
+
+while True:
+    choice = input("Enter 'r' to try another guess, anything else to continue to letter swap\n\n\n")
+    if choice != 'r':
+        break
+    group_bucket_copy = group_bucket.copy()
+    for i in range(len(group_bucket_copy)):
+        shuffled_group = shuffle(group_bucket_copy[i])
+        group_bucket_copy[i] = shuffled_group
+    #printGroups(group_bucket_copy)
+    newList = listConcat(group_bucket_copy)
+    CipherFreq = getFrequencies(CipherText)
+    frequencyList = freqDictToList(CipherFreq)
+    #print("cipherfreq: ", printDict(CipherFreq), "\nFrequency List: ", frequencyList)
+    cipherEngMap = cipherEngFreqMap(CipherFreq, frequencyList, newList)
+    #printDict(cipherEngMap)
+    newGuess = freqMap(cipherEngMap, CipherText)
+    
+    print("\n\n\nNew guess using frequency analysis:\n", newGuess, "\n")
+
+
 
 while True:
     
