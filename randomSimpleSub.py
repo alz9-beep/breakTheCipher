@@ -10,6 +10,21 @@ def printDict(dictionary):
         print("key:", key, "\tval:", val)
 
 
+def printFrequencies(cipherFreq: dict):
+    """Print the frequency distribution table, from most to least frequent."""
+    print("\nFrequency distribution:")
+
+    letterPairs = []
+    for letter, count in cipherFreq.items():
+        letterPairs.append((count, letter))
+    letterPairs.sort(reverse=True)
+
+    for count, letter in letterPairs:
+        print(letter, "->", count)
+
+    print()
+
+
 # Count uppercase letter frequencies in the ciphertext.
 def getFrequencies(cipherText: str) -> dict:
     return dict(Counter(
@@ -18,7 +33,7 @@ def getFrequencies(cipherText: str) -> dict:
     ))
 
 
-# Dynamically build groups based on the requested group size. We should recommend a size based on testing !!
+# Dynamically build groups based on the requested group size.
 def buildGroups(alphabetFreq: list, groupSize: int) -> list:
     groups = []
 
@@ -156,6 +171,8 @@ def main():
     if not CipherFreq:
         print("Ciphertext contains no alphabetic characters!")
         sys.exit()
+
+    printFrequencies(CipherFreq)
 
     # English letter frequency order, highest to lowest.
     alphabetFreq = list("etaoinshrdlcumwfgypbvkjxqz")
