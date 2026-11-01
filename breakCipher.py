@@ -212,6 +212,11 @@ def main():
         if choice != "r":
             break
 
+        # Groups of one letter have nothing to shuffle, so every guess would be identical
+        if groupSize == 1:
+            print("\nGroup size 1 can't be shuffled. Enter 'g' to pick a larger group size.")
+            continue
+
         shuffledGroups = shuffleGroups(group_bucket)
         newAlphabetFreq = listConcat(shuffledGroups)
 
@@ -223,7 +228,7 @@ def main():
 		
         clearTerminal()
 
-        print("\nNew guess using frequency analysis:")
+        print("\nNew guess #" + str(len(history)) + " using frequency analysis:")
         print(newGuess)
 
 
