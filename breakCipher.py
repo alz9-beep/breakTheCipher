@@ -5,11 +5,6 @@ import random
 from collections import Counter
 
 
-def printDict(dictionary):
-    for key, val in dictionary.items():
-        print("key:", key, "\tval:", val)
-
-
 def printFrequencies(cipherFreq: dict):
     """Print the frequency distribution table, from most to least frequent."""
     print("\nFrequency distribution:")
